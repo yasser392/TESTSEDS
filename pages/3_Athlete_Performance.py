@@ -142,6 +142,40 @@ else:
 
 st.markdown("---")
 
+# Athlete Distribution Hierarchy
+st.markdown("### 🏆 Athlete Distribution Hierarchy")
+st.markdown("Explore how athletes are distributed across Sports, Disciplines, and Countries.")
+
+if len(filtered_athletes) > 0:
+    # Prepare data for Sunburst
+    # We need to explode disciplines since it's a list
+    athlete_sunburst_data = filtered_athletes[['country', 'disciplines']].copy()
+    athlete_sunburst_data = athlete_sunburst_data.explode('disciplines')
+    
+    # We'll group by Discipline (which effectively functions as Sport here) -> Country
+    # Note: In this dataset 'disciplines' often contains the Sport name. 
+    # If we had a separate Sport column we would use it.
+    
+    sunburst_grouped = athlete_sunburst_data.groupby(['disciplines', 'country']).size().reset_index(name='count')
+    
+    # Filter out small counts for better visualization if needed, or keep all
+    
+    fig_athlete_sunburst = px.sunburst(
+        sunburst_grouped,
+        path=['disciplines', 'country'],
+        values='count',
+        title="Athletes by Sport -> Country",
+        color='disciplines',
+        color_discrete_sequence=px.colors.qualitative.Bold
+    )
+    
+    fig_athlete_sunburst.update_layout(height=600)
+    st.plotly_chart(fig_athlete_sunburst, width="stretch")
+else:
+    st.info("No athlete data available for hierarchy")
+
+st.markdown("---")
+
 # Athlete Age Distribution
 st.markdown("### 📊 Athlete Age Distribution")
 

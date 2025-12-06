@@ -159,11 +159,24 @@ else:
 
 st.markdown("---")
 
-# Top 20 Countries vs Medals
-st.markdown("### 🏆 Top 20 Countries vs. Medals")
+# Top Countries vs Medals (Enhanced)
+st.markdown("### 🏆 Top Countries by Total Medals")
+
+col_filter1, col_filter2 = st.columns([1, 3])
+
+with col_filter1:
+    # Continent Filter for Ranking
+    available_continents = ["All"] + sorted(filtered_medals['continent'].dropna().unique().tolist())
+    selected_continent_rank = st.selectbox("Filter by Continent:", available_continents, index=0)
 
 if len(filtered_medals) > 0:
-    top_20 = filtered_medals.nlargest(20, 'Total')
+    # Filter by continent if selected
+    ranking_data = filtered_medals.copy()
+    if selected_continent_rank != "All":
+        ranking_data = ranking_data[ranking_data['continent'] == selected_continent_rank]
+    
+    # Sort by Total
+    top_20 = ranking_data.nlargest(20, 'Total')
     
     fig_countries = go.Figure()
     fig_countries.add_trace(go.Bar(name='Gold', x=top_20['country'], y=top_20['Gold Medal'], marker_color='#FFD700'))
